@@ -7,6 +7,7 @@ const STORE = {
     {name: 'bread', checked: false}
   ],
   hideCompleted:  false,
+  searchedItems: [],
 };
 
 
@@ -20,6 +21,9 @@ function generateItemElement(item, itemIndex, template) {
         </button>
         <button class="shopping-item-delete js-item-delete">
             <span class="button-label">delete</span>
+        </button>
+        <button class="shopping-item-edit js-item-edit">
+            <span class="button-label">edit</span>
         </button>
       </div>
     </li>`;
@@ -37,12 +41,20 @@ function generateShoppingItemsString(shoppingList) {
 
 function renderShoppingList() {
   // render the shopping list in the DOM
-  let hideCheckedItems = Array.from(STORE.items);
-  if (STORE.hideCompleted){
-    hideCheckedItems = hideCheckedItems.filter(item => !item.checked);
+  let filteredItems = [...STORE.items];
+
+  if (!(STORE.searchedItems.length === 0)){
+    //toggle visibily of searched items
+    filteredItems = STORE.searchedItems;
+    //console.log('filtered items:' + filteredItems);
   }
-  
-  const shoppingListItemsString = generateShoppingItemsString(hideCheckedItems);
+
+  if (STORE.hideCompleted){
+    //toggle visibility of checked items
+    filteredItems = filteredItems.filter(item => !item.checked);
+  }
+
+  const shoppingListItemsString = generateShoppingItemsString(filteredItems);
 
   // insert that HTML into the DOM
   $('.js-shopping-list').html(shoppingListItemsString);
@@ -105,6 +117,12 @@ function handleDeleteItemClicked() {
     renderShoppingList();
   });
 }
+function toggleEditItemName() {
+
+}
+function handleEditItemClicked() {
+
+}
 
 function toggleHideItems(itemIndex){
   console.log('Toggling checked property for item at index ' + itemIndex);
@@ -121,8 +139,26 @@ function handleToggleHideClicked(){
   });
 }
 
-function toggleEditItemName() {}
-function handleToggleEdit(){}
+function handleSearchInputted(){
+  // prevents pressing enter on search bar which resulted in another item being added
+  $('#search-bar').keypress(function (event){
+    if (event.keyCode ===13){
+      event.preventDefault();
+    }
+  });
+
+  $('#search-bar').on('keyup', function(){
+  // assigns search-bar value to variable then filters
+    let value = $(this).val().toLowerCase();
+    STORE.searchedItems = STORE.items.filter(function(item){
+      return item.name.toLowerCase().indexOf(value)> -1;
+    });
+    // render
+    renderShoppingList();
+  });
+}
+
+
 
 function handleShoppingList() {
   renderShoppingList();
@@ -130,7 +166,11 @@ function handleShoppingList() {
   handleItemCheckClicked();
   handleDeleteItemClicked();
   handleToggleHideClicked();
+  handleSearchInputted();
+  handleEditItemClicked();
 }
 
 // when the page loads, call `handleShoppingList`
 $(handleShoppingList);
+
+// search 
