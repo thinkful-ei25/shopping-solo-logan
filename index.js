@@ -8,13 +8,14 @@ const STORE = {
   ],
   hideCompleted:  false,
   searchedItems: [],
+  editedItems: [],
 };
 
 
 function generateItemElement(item, itemIndex, template) {
   return `
     <li class="js-item-index-element" data-item-index="${itemIndex}">
-      <span class="shopping-item js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
+      <span id ="shopping-item-edit" class="shopping-item js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
       <div class="shopping-item-controls">
         <button class="shopping-item-toggle js-item-toggle">
             <span class="button-label">check</span>
@@ -43,7 +44,7 @@ function renderShoppingList() {
   // render the shopping list in the DOM
   let filteredItems = [...STORE.items];
 
-  if (!(STORE.searchedItems.length === 0)){
+  if (STORE.searchedItems.length !== 0){
     //toggle visibily of searched items
     filteredItems = STORE.searchedItems;
     //console.log('filtered items:' + filteredItems);
@@ -117,11 +118,19 @@ function handleDeleteItemClicked() {
     renderShoppingList();
   });
 }
-function toggleEditItemName() {
 
-}
+
 function handleEditItemClicked() {
+  $('.js-shopping-list').on('click', '#shopping-item-edit', function(event) {
+    event.preventDefault();
+    const itemIndex = getItemIndexFromElement(event.currentTarget);
+    let value = $('#shopping-item-edit').val();
+    console.log(value);
+    $(this).closest('div').attr('contenteditable','true');
+    
+    
 
+  });
 }
 
 function toggleHideItems(itemIndex){
