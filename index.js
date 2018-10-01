@@ -15,7 +15,7 @@ const STORE = {
 function generateItemElement(item, itemIndex, template) {
   return `
     <li class="js-item-index-element" data-item-index="${itemIndex}">
-      <span id ="shopping-item-edit" class="shopping-item js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
+      <span class="shopping-item js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
       <div class="shopping-item-controls">
         <button class="shopping-item-toggle js-item-toggle">
             <span class="button-label">check</span>
@@ -26,6 +26,9 @@ function generateItemElement(item, itemIndex, template) {
         <button class="shopping-item-edit js-item-edit">
             <span class="button-label">edit</span>
         </button>
+      <div class="shopping-item-edit-div hidden"><input value=${item.name}></input>
+          <button class="confirm-button">confirm</button>
+      </div>
       </div>
     </li>`;
 }
@@ -121,15 +124,24 @@ function handleDeleteItemClicked() {
 
 
 function handleEditItemClicked() {
-  $('.js-shopping-list').on('click', '#shopping-item-edit', function(event) {
-    event.preventDefault();
-    const itemIndex = getItemIndexFromElement(event.currentTarget);
-    let value = $('#shopping-item-edit').val();
-    console.log(value);
-    $(this).closest('div').attr('contenteditable','true');
-    
-    
+  $('.js-shopping-list').on('click', '.js-item-edit', event => {
+    //remove hidden on click of edit to edit current title
+    $(event.target).closest('li').find('.shopping-item-edit-div').toggleClass('hidden');
+    //get current item and hide it
+    $(event.target).closest('li').find('.js-shopping-item').toggleClass('hidden');
+  });
+}
 
+function handleEditItemConfirm() {
+  $('.js-shopping-list').on('click', '.confirm-button', event => {
+    // get item value of current item
+    const editedItem = $(event.target).closest('li').find('input').val();
+    // get the item index of current item
+    const itemIndex = $(event.target).closest('.js-item-index-element').attr('data-item-index');
+    // change title name
+    // console.log(STORE.items[itemIndex].name);
+    STORE.items[itemIndex].name = editedItem;
+    renderShoppingList();
   });
 }
 
@@ -177,6 +189,7 @@ function handleShoppingList() {
   handleToggleHideClicked();
   handleSearchInputted();
   handleEditItemClicked();
+  handleEditItemConfirm();
 }
 
 // when the page loads, call `handleShoppingList`
